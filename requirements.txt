@@ -1,0 +1,23 @@
+# Flask API (ml_server.py) — fill prediction + citizen reports + waste image classification
+python-dotenv>=1.0.0
+flask>=3.0.0
+gunicorn>=22.0.0
+numpy>=1.24.0
+scikit-learn>=1.3.0
+
+# Waste classification (optional but recommended for Image Classification page)
+# CPU-only PyTorch; first run downloads the HF model (~100–500 MB).
+torch>=2.1.0
+transformers>=4.36.0
+pillow>=10.0.0
+accelerate>=0.26.0
+safetensors>=0.4.0
+
+# ViT fine-tuning (backend/scripts/train_waste_vit.py) — folder datasets + metrics + plots
+datasets>=2.16.0
+evaluate>=0.4.0
+matplotlib>=3.8.0
+
+# YOLOv8 baseline (comparison + safeguard cues) — first run downloads yolov8n.pt (~6 MB).
+ultralytics>=8.2.0
+opencv-python-headless>=4.9.0

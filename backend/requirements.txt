@@ -1,0 +1,5 @@
+# Minimal deps for backend/app.py (mock ML API).
+# Install: pip install -r backend/requirements.txt
+python-dotenv>=1.0.0
+flask>=3.0.0
+pillow>=10.0.0

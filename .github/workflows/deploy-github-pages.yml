@@ -1,0 +1,39 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Copies Vite build into docs/ on main. In repo Settings → Pages set:
+# Source: Deploy from a branch → Branch: main → Folder: /docs
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pages-docs
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # Avoid loops when the deploy bot commits back to main
+    if: ${{ github.event_name == 'workflow_dispatch' || !contains(github.event.head_commit.message, '[skip ci]') }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm ci
+      - run: npm run build:github
+      - name: Sync dist → docs
+        run: |
+          rm -rf docs
+          mkdir -p docs
+          cp -r dist/. docs/
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore(pages): deploy Vite build to docs/ [skip ci]"
+          file_pattern: "docs/"

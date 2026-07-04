@@ -1,0 +1,63 @@
+path,ui_label,dataset_class,timestamp
+dataset/organic/f2265b7818ae4a70b719729c619f6aaf.jpg,Organic / Food waste,organic,1778500818
+dataset/organic/fae98b269a5f4801ae04477cd29890f5.jpg,Organic / Food waste,organic,1778500871
+dataset/organic/7da53b9acecd46748d1773d0ded882be.jpg,Organic / Food waste,organic,1778500989
+dataset/organic/792df64d1d154f0086fb175d6029ed98.jpg,Organic / Food waste,organic,1778501471
+dataset/organic/722d428fd7e64c1d85a3e2dd34252e7d.jpg,Organic / Food waste,organic,1778501505
+dataset/organic/3213ac596c134d06b36bffa459af8735.jpg,Organic / Food waste,organic,1778501540
+dataset/organic/a4f5fd93c9b4471a8578bf2e284fd063.jpg,Organic / Food waste,organic,1778501569
+dataset/organic/e92cd226a4564a93a5bdf408afb92f1a.jpg,Organic / Food waste,organic,1778501601
+dataset/mixed/2985c2b48fe74a149e9cfbabb3c16030.jpg,Mixed / Other,mixed,1778512763
+dataset/mixed/f9fd1c0e6f8245c7be29cdbd4669eaed.jpg,Mixed / Other,mixed,1778512779
+dataset/organic/d0deb9270be74e1b97b98c9cc6331acf.jpg,Organic / Food waste,organic,1778513301
+dataset/mixed/499d8dff3a2448dba107ac363ccf79c1.jpg,Mixed / Other,mixed,1778513359
+dataset/organic/970766b01126489b80908d91211cac58.jpg,Organic / Food waste,organic,1778516602
+dataset/plastic/f6e3f6c5a70441ae98d9ded7db4e4f2f.jpg,Plastic,plastic,1778516710
+dataset/metal/0790e6ca930a4d2f8b6a24dfb609eb86.jpg,Metal,metal,1778519035
+dataset/organic/09036ce5c88242899ec73cb1fcfbda85.jpg,Organic / Food waste,organic,1778519091
+dataset/organic/21fc38e100b44a999b4c91b8da339d3a.jpg,Organic / Food waste,organic,1778521796
+dataset/plastic/f906c46408a941b99bd1b2e68d4691db.jpg,Plastic,plastic,1778524801
+dataset/plastic/4bca5f57f3dd4766881f410edddd9b6e.jpg,Plastic,plastic,1778524802
+dataset/plastic/c3d650cd69234571adf66fa37624885b.jpg,Plastic,plastic,1778524805
+dataset/plastic/3c142798daf24b908afa504dbeaff707.jpg,Plastic,plastic,1778524871
+dataset/metal/01e03c08337d4fca964b385a0548f0b5.jpg,Metal,metal,1778525259
+dataset/metal/3d4dc18f06394876b2383e7663b8f362.jpg,Metal,metal,1778525837
+dataset/plastic/5e5584404b4b4890bc7748746c21f8a1.jpg,Plastic,plastic,1778526036
+dataset/metal/618647a0bf074eca88df0a208684504b.jpg,Metal,metal,1778526478
+dataset/glass/81e125c2659a41279c457b8fe799ce00.jpg,Glass,glass,1778526602
+dataset/organic/303048cc4c474efd81e3112ff40d7761.jpg,Organic / Food waste,organic,1778527421
+dataset/plastic/b902076a2b0c4dadb225f1e48bb16d66.jpg,Plastic,plastic,1778527444
+dataset/organic/606957d8e6c54a688e2eb8cd02e17a40.jpg,Organic / Food waste,organic,1778527459
+dataset/metal/0fe9841fa0504d8883a4821f1ae9ec8d.jpg,Metal,metal,1778527479
+dataset/organic/d3fabc0f1aa5442f871d03c12a87180f.jpg,Organic / Food waste,organic,1778527527
+dataset/mixed/b79a5290dd69422387d8f62cb87a5c0f.jpg,Mixed / Other,mixed,1778528267
+dataset/organic/0eb010b28f4144b180bec392b438a8bd.jpg,Organic / Food waste,organic,1778528292
+dataset/organic/7a4f9566c31444f9b6cb1bade10c4738.jpg,Organic / Food waste,organic,1778528350
+dataset/glass/0e437922df17410c9a1c8698758742f2.jpg,Glass,glass,1778528357
+dataset/glass/7a4bed7c0ac341f6a2efcdf3e0b22bc8.jpg,Glass,glass,1778528360
+dataset/glass/0d6b06dbaff147b6a9c168f8380fc40d.jpg,Glass,glass,1778528372
+dataset/glass/8c1accd1e5314df9bb5cc6a129a69c43.jpg,Glass,glass,1778528372
+dataset/paper/fcdd6a44901044f192adf76dc6c31670.jpg,Paper / Cardboard,paper,1778529597
+dataset/paper/e6c8c82fe065467fa705dc8dc2dd17f2.jpg,Paper / Cardboard,paper,1778530504
+dataset/organic/d458033bb80843a98920c95dc28af6cf.jpg,Organic / Food waste,organic,1778530565
+dataset/metal/a3e81d605a5a4976841b40a409f6e1d8.jpg,Metal,metal,1778531052
+dataset/plastic/7d77e503d50148e88061f41a08deee2d.jpg,Plastic,plastic,1778531085
+dataset/glass/fd0b8669bb5a430a8965b3d99e001187.jpg,Glass,glass,1778531673
+dataset/paper/7cd597d26e0743cf9577c844239a6e5d.jpg,Paper / Cardboard,paper,1778531688
+dataset/paper/96a6bfc97dca496699ce7f7f67e4f0d9.jpg,Paper / Cardboard,paper,1778535171
+dataset/plastic/3d540f9040024e1db7473bbd78ff2512.jpg,Plastic,plastic,1778535314
+dataset/glass/1bb54702b2d34bcd83a785261c74450d.jpg,Glass,glass,1778535332
+dataset/paper/4ebb349886214201abf57046d8c53982.jpg,Paper / Cardboard,paper,1778535459
+dataset/glass/d03a1a3150d542529aa5edd2fbaca40d.jpg,Glass,glass,1778536967
+dataset/metal/9251766c3122434b9aefeee9b93ef54a.jpg,Metal,metal,1778540154
+dataset/organic/d49fa2a33b1743648832d1ea5b030c22.jpg,Organic / Food waste,organic,1778540527
+dataset/paper/845bb048d25d43ee884113c47e8c3460.jpg,Paper / Cardboard,paper,1778540946
+dataset/organic/d79dd691c8c94f7cb99f52d8ea90f5b9.jpg,Organic / Food waste,organic,1778540974
+dataset/paper/aaf54c7e86b848df85c09f77d4ce6246.jpg,Paper / Cardboard,paper,1778541065
+dataset/plastic/243a525568cc4d11a2dc4ffbbb70a477.jpg,Plastic,plastic,1778541097
+dataset/plastic/c2ce6359538e4f0a8104f420fec0262c.jpg,Plastic,plastic,1778541161
+dataset/organic/15f8960763144cc29b23a26b3cdf6e62.jpg,Organic / Food waste,organic,1778541399
+dataset/glass/1c06e9341d604a1b864c9f052c6c79d0.jpg,Glass,glass,1778541790
+dataset/glass/128a4689787b445190788f36df6844d8.jpg,Glass,glass,1778541822
+dataset/glass/e1c4fce4a48a4df9952600c2a3b1e103.jpg,Glass,glass,1778541850
+dataset/glass/e55d4f75d77a421ba7996be189f8a65e.jpg,glass,glass,1778541889

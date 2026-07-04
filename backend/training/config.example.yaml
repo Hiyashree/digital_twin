@@ -1,0 +1,43 @@
+# Copy to config.yaml and adjust paths (config.yaml is gitignored by convention).
+#
+# Put downloads under ./data/ (see training/README.md). Large files stay local.
+
+paths:
+  # Optional common parent; individual keys can be absolute or relative to cwd.
+  data_root: data
+  trashnet: data/trashnet
+  # Raw TACO (COCO): run backend/scripts/convert_taco_to_imagefolder.py → taco_imagefolder
+  taco: data/taco
+  taco_imagefolder: data/taco_imagefolder
+  kaggle_waste: data/kaggle_waste
+  meghalaya_custom: data/meghalaya_custom
+
+# Which built-in layout to use: trashnet | kaggle_waste | meghalaya | taco_imagefolder
+# For raw TACO COCO, convert first and set dataset: taco_imagefolder.
+dataset: trashnet
+
+# Optional: merge extra ImageFolder roots into the same label space (folder names must match).
+extra_datasets: []
+# example:
+# extra_datasets:
+#   - name: meghalaya
+#     path: data/meghalaya_custom
+
+preprocess:
+  train_ratio: 0.70
+  val_ratio: 0.15
+  test_ratio: 0.15
+  seed: 42
+  # Written next to checkpoints (splits.json + optional prepared manifest)
+  splits_path: checkpoints/waste-vit-training/splits.json
+  augment_train: true
+
+train:
+  model_name: google/vit-base-patch16-224
+  output_dir: checkpoints/waste-vit-training
+  epochs: 3
+  batch_size: 8
+  learning_rate: 5.0e-5
+  warmup_ratio: 0.05
+  num_workers: 0
+  save_plots: true

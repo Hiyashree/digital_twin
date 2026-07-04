@@ -1,0 +1,33 @@
+node_modules
+dist
+
+# Local editor / debug traces (never commit)
+.cursor/
+debug-*.log
+__pycache__/
+*.pyc
+.DS_Store
+*.local
+
+# Environment — copy from .env.example
+.env
+.env.local
+.env.*.local
+
+# Human-labeled images from POST /training_feedback (ml_server.py)
+training_feedback/
+
+# Fine-tuned ViT checkpoints (scripts/train_waste_vit.py)
+checkpoints/
+
+# Synthetic smoke-test JPEGs (--bootstrap_synthetic_per_class); not real labelled waste
+dataset/**/synth_*.jpg
+
+# Local dataset downloads (training/README.md); keep placeholders only
+data/**
+!data/.gitkeep
+!data/**/.gitkeep
+!data/README.md
+
+# Local training config (copy from backend/training/config.example.yaml)
+backend/training/config.yaml
