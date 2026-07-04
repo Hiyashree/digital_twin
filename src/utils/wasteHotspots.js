@@ -188,7 +188,7 @@ export function binsWithinHotspotAreas(bins) {
 
 /**
  * Real-time-style garbage pressure for a hotspot: inverse-distance-weighted mean of bin fill %.
- * Nearby bins dominate; bins update on the dashboard simulation (~5s), so this tracks that signal.
+ * Nearby bins dominate; simulated IoT telemetry ticks every ~5s (see binTelemetrySimulator.js).
  * Prefers online bins; falls back to all bins if none are online.
  */
 function pressureBoostFromSitePhotosKg(kg) {

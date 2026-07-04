@@ -15,7 +15,7 @@ const sidebarNav = [
   { to: `${DASH}/classify`, label: "Image Classification", icon: "▣" },
   { to: `${DASH}/ml-data`, label: "ML Data Hub", icon: "◇" },
   { to: `${DASH}/analytics`, label: "Analytics", icon: "◈" },
-  { to: `${DASH}/bins`, label: "Bins", icon: "▦" },
+  { to: `${DASH}/bins`, label: "Smart Bins", icon: "▦" },
   { to: `${DASH}/reports`, label: "Waste Reports", icon: "▤" },
   { to: `${DASH}/datasets`, label: "Dataset Management", icon: "◫" },
   { to: `${DASH}/alerts`, label: "Alerts & Notifications", icon: "◐" },
@@ -60,7 +60,7 @@ function routeMeta(pathname) {
       headerRole: "Super Admin",
     };
   if (p.includes("/bins"))
-    return { ...metaDefaults, title: "Bins", subtitle: "Bin telemetry, predictions, and assignments." };
+    return { ...metaDefaults, title: "Smart Bins", subtitle: "Simulated IoT telemetry, Leaflet map, and Python waste-flow analysis." };
   if (p.includes("/field"))
     return {
       ...metaDefaults,

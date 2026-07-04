@@ -48,6 +48,7 @@ from ml.waste_pipeline.response import (
     finalize_research_payload,
 )
 from ml.waste_pipeline.simple_pipeline import run_simple_waste_pipeline
+from ml.waste_flow_simulator import analyze_waste_flow
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "change-this-in-production"
@@ -451,6 +452,16 @@ def me():
         "username": payload.get("sub"),
         "email": payload.get("email"),
     })
+
+
+@app.route('/waste-flow/analyze', methods=['POST'])
+def waste_flow_analyze():
+    """Python waste-flow analysis over simulated IoT bin telemetry."""
+    data = request.json or {}
+    bins = data.get('bins')
+    if not isinstance(bins, list):
+        return jsonify({"message": "Expected JSON { bins: [...] }"}), 400
+    return jsonify(analyze_waste_flow(bins))
 
 
 @app.route('/predict', methods=['POST'])

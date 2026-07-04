@@ -19,6 +19,15 @@ import { DashboardNotificationProvider } from "../context/DashboardNotificationC
 import { DatasetLibraryProvider } from "../context/DatasetLibraryContext.jsx";
 import { ImageClassificationSessionProvider } from "../context/ImageClassificationSessionContext.jsx";
 import DashboardHome from "./DashboardHome.jsx";
+import WasteMap from "./WasteMap.jsx";
+import ExpandableMapFrame from "./ExpandableMapFrame.jsx";
+import {
+  TELEMETRY_TICK_MS,
+  binsForAnalysisApi,
+  buildHistoricalSnapshots,
+  createLiveBinState,
+  tickBins,
+} from "../data/binTelemetrySimulator.js";
 import AlertsNotifications from "./AlertsNotifications.jsx";
 import WasteReports from "./WasteReports.jsx";
 import DatasetManagement from "./DatasetManagement.jsx";
@@ -369,20 +378,7 @@ export default function Dashboard({ initialBins, getPrediction }) {
   const [assignMenuBin, setAssignMenuBin] = useState(null);
   /** Last prediction shown per bin (always updated synchronously so the button visibly “does something”). */
   const [binPrediction, setBinPrediction] = useState({});
-  const [bins, setBins] = useState(() =>
-    initialBins.map((b) => ({
-      ...b,
-      assigned: false,
-      assignedTruck: null,
-      assignedTruckId: null,
-      highFillCount: b.fill >= 85 ? 1 : 0,
-      hotspot: b.fill >= 95,
-      fillHistory: [b.fill],
-      isOnline: true,
-      lastSeen: new Date(),
-      offlineCount: 0,
-    }))
-  );
+  const [bins, setBins] = useState(() => createLiveBinState(initialBins));
   const [routeData, setRouteData] = useState({ stops: [], coordinates: [], distance: 0, warning: "" });
   const [routeMessage, setRouteMessage] = useState(
     "Site-based routing: collection paths use tourist POI centers ranked by garbage pressure (bin telemetry weights severity only)."
@@ -410,49 +406,45 @@ export default function Dashboard({ initialBins, getPrediction }) {
   const [reportsReady, setReportsReady] = useState(false);
   const [selectedReplayMode, setSelectedReplayMode] = useState("current");
   const [activeScenario, setActiveScenario] = useState(null);
-  const [historicalBins] = useState(() => ({
-    morning: initialBins.map((b) => {
-      const fill = Math.max(5, b.fill - 10);
-      return {
-        ...b,
-        fill,
-        temperature: Math.max(18, b.temperature - 2),
-        gas: Math.max(10, b.gas - 6),
-        lastCollected: "06:30 AM",
-        assigned: false,
-        assignedTruck: null,
-        assignedTruckId: null,
-        highFillCount: fill >= 85 ? 1 : 0,
-        hotspot: fill >= 95,
-        fillHistory: [fill],
-        isOnline: true,
-        lastSeen: new Date(),
-        offlineCount: 0,
-      };
-    }),
-    evening: initialBins.map((b) => {
-      const fill = Math.min(100, b.fill + 12);
-      return {
-        ...b,
-        fill,
-        temperature: b.temperature + 3,
-        gas: Math.min(100, b.gas + 7),
-        lastCollected: "07:00 PM",
-        assigned: false,
-        assignedTruck: null,
-        assignedTruckId: null,
-        highFillCount: fill >= 85 ? 1 : 0,
-        hotspot: fill >= 95,
-        fillHistory: [fill],
-        isOnline: true,
-        lastSeen: new Date(),
-        offlineCount: 0,
-      };
-    }),
-  }));
+  const [wasteFlowAnalysis, setWasteFlowAnalysis] = useState(null);
+  const [historicalBins] = useState(() => buildHistoricalSnapshots(initialBins));
   const activeBins = selectedReplayMode === "current"
     ? (activeScenario ? activeScenario.result.modifiedBins : bins)
     : historicalBins[selectedReplayMode];
+
+  useEffect(() => {
+    if (selectedReplayMode !== "current" || activeScenario) return undefined;
+
+    const id = setInterval(() => {
+      setBins((prev) => tickBins(prev));
+    }, TELEMETRY_TICK_MS);
+
+    return () => clearInterval(id);
+  }, [selectedReplayMode, activeScenario]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const run = async () => {
+      try {
+        const res = await fetch(apiUrl("/api/waste-flow/analyze"), {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ bins: binsForAnalysisApi(activeBins) }),
+        });
+        if (!cancelled && res.ok) {
+          setWasteFlowAnalysis(await res.json());
+        }
+      } catch {
+        if (!cancelled) setWasteFlowAnalysis(null);
+      }
+    };
+    void run();
+    const id = setInterval(run, TELEMETRY_TICK_MS * 2);
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+    };
+  }, [activeBins]);
 
   useEffect(() => {
     const sync = () => setHotspotSitePhotos(loadHotspotSitePhotos());
@@ -1032,18 +1024,122 @@ export default function Dashboard({ initialBins, getPrediction }) {
               <div style={cardHeader}>
                 <div>
                   <h3 style={cardTitle}>
-                    {selectedReplayMode === "current" ? "Bins" : `${selectedReplayMode} replay`}
+                    {selectedReplayMode === "current" ? "Smart Bins — IoT Digital Twin" : `${selectedReplayMode} replay`}
                   </h3>
-                  <p style={{ margin: 0, color: "rgba(255,255,255,0.7)", fontSize: 13 }}>
-                    Full-width list with scroll — safe to grow as you add bins.
+                  <p style={{ margin: "6px 0 0", color: "rgba(255,255,255,0.7)", fontSize: 13, maxWidth: 640 }}>
+                    Simulated IoT sensors stream fill, temperature, and gas every {TELEMETRY_TICK_MS / 1000}s.
+                    Leaflet map + Python waste-flow analysis power real-time monitoring.
                   </p>
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 12, alignItems: "center" }}>
+                    {["current", "morning", "evening"].map((mode) => (
+                      <button
+                        key={mode}
+                        type="button"
+                        onClick={() => setSelectedReplayMode(mode)}
+                        style={{
+                          border: selectedReplayMode === mode ? "1px solid rgba(92,184,92,0.55)" : "1px solid rgba(255,255,255,0.14)",
+                          background: selectedReplayMode === mode ? "rgba(92,184,92,0.18)" : "rgba(255,255,255,0.06)",
+                          color: selectedReplayMode === mode ? "#ecfdf5" : "rgba(226,240,232,0.88)",
+                          padding: "6px 12px",
+                          borderRadius: 10,
+                          fontSize: 12,
+                          fontWeight: 700,
+                          cursor: "pointer",
+                          textTransform: "capitalize",
+                        }}
+                      >
+                        {mode === "current" ? "Live feed" : mode}
+                      </button>
+                    ))}
+                    {selectedReplayMode === "current" && (
+                      <span
+                        style={{
+                          fontSize: 11,
+                          fontWeight: 700,
+                          padding: "4px 10px",
+                          borderRadius: 999,
+                          background: "rgba(92,184,92,0.2)",
+                          border: "1px solid rgba(92,184,92,0.45)",
+                          color: "#bbf7d0",
+                        }}
+                      >
+                        ● {activeBins.filter((b) => b.isOnline).length}/{activeBins.length} online
+                        {offlineCount > 0 ? ` · ${offlineCount} offline` : ""}
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <NavLink to={DASH} style={navLinkBtn}>
                   ← Overview
                 </NavLink>
               </div>
               <div style={cardContent}>
-                <div style={{ maxHeight: "min(72vh, 920px)", overflowY: "auto", paddingRight: 4 }}>
+                <ExpandableMapFrame
+                  title="Bin locations — Leaflet.js"
+                  subtitle="Circle markers show live simulated IoT fill levels across Meghalaya."
+                  collapsedHeight="clamp(320px, 42vh, 480px)"
+                  cardStyle={{
+                    marginBottom: 16,
+                    borderRadius: 14,
+                    overflow: "hidden",
+                    border: "1px solid rgba(130, 230, 180, 0.22)",
+                    background: "rgba(8, 18, 32, 0.55)",
+                  }}
+                >
+                  <WasteMap
+                    bins={activeBins}
+                    routeData={routeData}
+                    depots={municipalDepots}
+                    selectedDepot={selectedDepot}
+                    citizenReports={citizenReports}
+                    hotspotSitePhotos={hotspotSitePhotos}
+                    hotspotZones={mergedWasteHotspots}
+                    showWasteHotspots={false}
+                    showObservationHeat={false}
+                    showBins
+                    showBinDensityHeat
+                  />
+                </ExpandableMapFrame>
+
+                {wasteFlowAnalysis && (
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+                      gap: 10,
+                      marginBottom: 16,
+                      padding: "12px 14px",
+                      borderRadius: 12,
+                      background: "rgba(59,130,246,0.1)",
+                      border: "1px solid rgba(59,130,246,0.28)",
+                      fontSize: 12,
+                    }}
+                  >
+                    <div>
+                      <div style={{ color: "rgba(255,255,255,0.55)", marginBottom: 2 }}>Avg fill (Python)</div>
+                      <div style={{ fontWeight: 800, fontSize: 18 }}>{wasteFlowAnalysis.avg_fill}%</div>
+                    </div>
+                    <div>
+                      <div style={{ color: "rgba(255,255,255,0.55)", marginBottom: 2 }}>Critical bins</div>
+                      <div style={{ fontWeight: 800, fontSize: 18 }}>{wasteFlowAnalysis.critical_count}</div>
+                    </div>
+                    <div>
+                      <div style={{ color: "rgba(255,255,255,0.55)", marginBottom: 2 }}>Offline sensors</div>
+                      <div style={{ fontWeight: 800, fontSize: 18 }}>{wasteFlowAnalysis.offline_count}</div>
+                    </div>
+                    {wasteFlowAnalysis.overflow_risk?.length > 0 && (
+                      <div style={{ gridColumn: "1 / -1", color: "#ffd166" }}>
+                        Overflow risk:{" "}
+                        {wasteFlowAnalysis.overflow_risk
+                          .slice(0, 3)
+                          .map((r) => `${r.name} (~${r.hours_to_full}h)`)
+                          .join(" · ")}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <div style={{ maxHeight: "min(52vh, 720px)", overflowY: "auto", paddingRight: 4 }}>
                   <div style={binList}>
                     {activeBins.map((bin) => (
                       <div
@@ -1063,8 +1159,9 @@ export default function Dashboard({ initialBins, getPrediction }) {
                               )}
                             </p>
                             <p style={binMeta}>
-                              Current fill: {bin.fill}% · {bin.assigned ? `Assigned to ${bin.assignedTruck}` : "Unassigned"}
-                              {!bin.isOnline && ` · Last seen: ${Math.round((Date.now() - bin.lastSeen.getTime()) / 60000)}m ago`}
+                              {bin.deviceId} · Fill {bin.fill}%
+                              {bin.assigned ? ` · ${bin.assignedTruck}` : " · Unassigned"}
+                              {!bin.isOnline && ` · Last seen ${Math.round((Date.now() - bin.lastSeen.getTime()) / 60000)}m ago`}
                             </p>
                           </div>
                           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
@@ -1167,12 +1264,12 @@ export default function Dashboard({ initialBins, getPrediction }) {
                             ) : null}
                             {!binPrediction[bin.name].updating && binPrediction[bin.name].source === "local" ? (
                               <span style={{ display: "block", marginTop: 6, fontSize: 11, color: "rgba(255,255,255,0.55)" }}>
-                                Sensor-based estimate (fill, temperature, gas). Start your Flask /predict service for ML-backed values.
+                                Local sensor estimate — run Flask for Python ML prediction.
                               </span>
                             ) : null}
                             {!binPrediction[bin.name].updating && binPrediction[bin.name].source === "api" ? (
                               <span style={{ display: "block", marginTop: 6, fontSize: 11, color: "rgba(255,255,255,0.55)" }}>
-                                Returned by the prediction API.
+                                Python RandomForest / waste-flow model.
                               </span>
                             ) : null}
                           </div>

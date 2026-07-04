@@ -48,6 +48,7 @@ if str(_BACKEND_ROOT) not in sys.path:
 
 from ml.waste_pipeline.categories import DISPLAY_LABEL, WASTE_KEYS
 from ml.waste_pipeline.config import load_pipeline_config
+from ml.waste_flow_simulator import analyze_waste_flow, predict_fill_from_sensors
 
 # Same repo-root `.env` as `ml_server.py` (PORT, etc.).
 try:
@@ -178,35 +179,44 @@ def training_feedback():
     ), 200
 
 
+@app.route("/waste-flow/analyze", methods=["POST"])
+def waste_flow_analyze():
+    """Python waste-flow analysis over simulated IoT bin telemetry."""
+    data = request.json or {}
+    bins = data.get("bins")
+    if not isinstance(bins, list):
+        return jsonify({"message": "Expected JSON { bins: [...] }"}), 400
+    return jsonify(analyze_waste_flow(bins))
+
+
 @app.route("/predict", methods=["POST"])
 def predict():
     """
-    Minimal stub for bin fill prediction — matches the shape App.jsx expects.
-    Full RandomForest lives in ml_server.py; this keeps one mock server usable alone.
+    Sensor-based fill prediction — matches the shape App.jsx expects.
+    Full RandomForest lives in ml_server.py; this uses waste_flow_simulator.
     """
     data = request.json or {}
     try:
         fill = float(data.get("fill", 0))
         time_h = float(data.get("time", 2))
+        temperature = float(data.get("temperature", 25))
+        gas = float(data.get("gas", 20))
     except (TypeError, ValueError):
-        fill, time_h = 0.0, 2.0
+        fill, time_h, temperature, gas = 0.0, 2.0, 25.0, 20.0
 
-    fill = max(0.0, min(100.0, fill))
-    time_h = max(0.5, min(12.0, time_h))
-
-    # Silly mock curve — not physical science, just keeps charts moving.
-    predicted = max(0.0, min(100.0, fill + time_h * 1.2))
+    area = str(data.get("area", "residential"))
+    predicted = predict_fill_from_sensors(fill, temperature, gas, area, time_h)
 
     return jsonify(
         {
-            "predicted_fill": round(predicted, 2),
-            "model_version": "mock-rf-stub",
+            "predicted_fill": predicted,
+            "model_version": "waste-flow-simulator",
             "inputs_used": {
                 "fill": fill,
                 "time": time_h,
-                "temperature": data.get("temperature"),
-                "gas": data.get("gas"),
-                "area": data.get("area"),
+                "temperature": temperature,
+                "gas": gas,
+                "area": area,
             },
         }
     )
@@ -306,7 +316,8 @@ def delete_report(report_id):
 if __name__ == "__main__":
     print(f"Mock ML API listening on http://127.0.0.1:{API_PORT}")
     print("  POST /classify_waste — mock waste labels")
-    print("  POST /predict        — mock bin fill")
+    print("  POST /waste-flow/analyze — Python IoT waste-flow analysis")
+    print("  POST /predict        — sensor-based bin fill projection")
     print("  GET/POST /reports    — hotspot / vision observations (in-memory)")
     print("  GET  /health         — sanity check")
     app.run(host="127.0.0.1", port=API_PORT, debug=True)

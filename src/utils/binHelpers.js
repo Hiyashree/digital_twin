@@ -45,7 +45,7 @@ export function getOverflowRisk(bin) {
   const delta = last - previous;
   if (delta <= 0) return null;
 
-  const simulatedIntervalMinutes = 15;
+  const simulatedIntervalMinutes = 5 / 60;
   const ratePerHour = (delta / simulatedIntervalMinutes) * 60;
   if (ratePerHour <= 0) return null;
 

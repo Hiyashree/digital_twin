@@ -33,6 +33,19 @@ const mapContainer = {
   position: "relative",
 };
 
+/** leaflet.heat canvas layers may not implement L.Layer#bringToBack. */
+function sendHeatLayerToBack(layer) {
+  if (!layer) return;
+  if (typeof layer.bringToBack === "function") {
+    layer.bringToBack();
+    return;
+  }
+  const canvas = layer._canvas;
+  if (canvas?.parentElement) {
+    canvas.parentElement.insertBefore(canvas, canvas.parentElement.firstChild);
+  }
+}
+
 export default function WasteMap({
   bins,
   routeData,
@@ -643,7 +656,7 @@ export default function WasteMap({
     });
     heat.addTo(map);
     visionHeatRef.current = heat;
-    heat.bringToBack();
+    sendHeatLayerToBack(heat);
 
     return () => {
       if (visionHeatRef.current) {
@@ -677,7 +690,7 @@ export default function WasteMap({
     });
     heat.addTo(map);
     binDensityHeatRef.current = heat;
-    heat.bringToBack();
+    sendHeatLayerToBack(heat);
 
     return () => {
       if (binDensityHeatRef.current) {
