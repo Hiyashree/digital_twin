@@ -155,6 +155,26 @@ next_report_id = 1
 # Waste: WASTE_PIPELINE_MODE=hf (default), WASTE_MODEL_ID=google/vit-base-patch16-224, mapping in ml/waste_pipeline/
 
 
+@app.route("/", methods=["GET"])
+@app.route("/health", methods=["GET"])
+def health():
+    """Render health checks and browser visits to the service root."""
+    return jsonify(
+        {
+            "ok": True,
+            "service": "digital-twin-api",
+            "endpoints": [
+                "/classify_waste",
+                "/reports",
+                "/predict",
+                "/waste-flow/analyze",
+                "/waste_model_config",
+                "/auth/login",
+            ],
+        }
+    )
+
+
 @app.route("/waste_model_config", methods=["GET"])
 def waste_model_config():
     """Expose pipeline mode, backbone, and target categories for dashboard / ops."""

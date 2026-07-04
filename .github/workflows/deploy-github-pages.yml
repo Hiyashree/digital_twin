@@ -28,6 +28,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build:github
+        env:
+          VITE_API_URL: https://digital-twin-9czs.onrender.com
       - name: Sync dist → docs
         run: |
           rm -rf docs

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import BrandLogo from "./BrandLogo.jsx";
+import { apiUrl } from "../config/api.js";
 import "./Login.css";
 
 export default function Login({ onSuccess, onTokenReceived }) {
@@ -21,7 +22,7 @@ export default function Login({ onSuccess, onTokenReceived }) {
 
       setLoading(true);
       try {
-        const res = await fetch("/auth/login", {
+        const res = await fetch(apiUrl("/auth/login"), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ username, password }),
@@ -61,7 +62,7 @@ export default function Login({ onSuccess, onTokenReceived }) {
 
     setLoading(true);
     try {
-      const res = await fetch("/auth/signup", {
+      const res = await fetch(apiUrl("/auth/signup"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, email, password }),
