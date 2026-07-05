@@ -184,7 +184,11 @@ export async function classifyWasteFromPreview(previewUrl) {
         `Classification timed out after ${CLASSIFY_TIMEOUT_MS / 1000}s. The model may still be loading on the server (watch the Flask terminal), or CPU inference is very slow — wait and try again.`
       );
     }
-    throw err;
+    const hint =
+      err instanceof TypeError && /failed to fetch/i.test(String(err.message))
+        ? " The Render API may still be waking up, or the server ran out of memory loading the ML model — wait 60s and retry. Check https://digital-twin-9czs.onrender.com/health and Render logs."
+        : "";
+    throw new Error(`${err instanceof Error ? err.message : String(err)}${hint}`);
   } finally {
     clearTimeout(timeoutId);
   }

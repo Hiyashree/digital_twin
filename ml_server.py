@@ -612,6 +612,11 @@ def _warm_waste_classifier_async():
     threading.Thread(target=_run, daemon=True, name="waste-model-warmup").start()
 
 
+# Gunicorn on Render sets PORT; warm the model at import so the first browser request does not OOM/time out.
+if os.environ.get("PORT"):
+    _warm_waste_classifier_async()
+
+
 if __name__ == '__main__':
     _warm_waste_classifier_async()
     _port = int(os.environ.get("PORT", "5000"))

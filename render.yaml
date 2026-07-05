@@ -1,18 +1,18 @@
 # Render Blueprint — API only. Host the React app on GitHub Pages (see .github/workflows).
-# After deploy, set VITE_API_URL on Pages build or rebuild frontend pointing at the Render URL.
+# Mobilenet uses less RAM than ViT on Render's 512MB instances.
 services:
   - type: web
     name: digital-twin-api
     runtime: python
     plan: starter
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn --bind 0.0.0.0:$PORT --timeout 120 --workers 1 ml_server:app
+    buildCommand: pip install torch --index-url https://download.pytorch.org/whl/cpu && pip install -r requirements-api.txt
+    startCommand: gunicorn --bind 0.0.0.0:$PORT --timeout 300 --workers 1 --preload ml_server:app
     envVars:
       - key: PYTHON_VERSION
         value: "3.11.9"
       - key: WASTE_BACKBONE
-        value: vit
+        value: mobilenet_v2
       - key: WASTE_MODEL_ID
-        value: google/vit-base-patch16-224
+        value: google/mobilenet_v2_1.0_224
       - key: YOLO_ENABLED
-        value: "true"
+        value: "false"

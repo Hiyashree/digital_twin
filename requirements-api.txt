@@ -1,0 +1,11 @@
+# Production API (Render) — inference only, no training/YOLO stack.
+python-dotenv>=1.0.0
+flask>=3.0.0
+gunicorn>=22.0.0
+numpy>=1.24.0
+scikit-learn>=1.3.0
+pillow>=10.0.0
+accelerate>=0.26.0
+safetensors>=0.4.0
+# Install CPU torch separately in render.yaml buildCommand (smaller wheel).
+transformers>=4.36.0
