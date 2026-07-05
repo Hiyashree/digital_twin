@@ -1,18 +1,15 @@
-# Render Blueprint — API only. Host the React app on GitHub Pages (see .github/workflows).
-# Mobilenet uses less RAM than ViT on Render's 512MB instances.
+# Render cloud — lite classifier fits in 512MB (no PyTorch). Full ViT runs locally only.
 services:
   - type: web
     name: digital-twin-api
     runtime: python
     plan: starter
-    buildCommand: pip install torch --index-url https://download.pytorch.org/whl/cpu && pip install -r requirements-api.txt
-    startCommand: gunicorn --bind 0.0.0.0:$PORT --timeout 300 --workers 1 --preload ml_server:app
+    buildCommand: pip install -r requirements-cloud.txt
+    startCommand: gunicorn --bind 0.0.0.0:$PORT --timeout 120 --workers 1 ml_server:app
     envVars:
       - key: PYTHON_VERSION
         value: "3.11.9"
-      - key: WASTE_BACKBONE
-        value: mobilenet_v2
-      - key: WASTE_MODEL_ID
-        value: google/mobilenet_v2_1.0_224
+      - key: WASTE_CLOUD_LITE
+        value: "true"
       - key: YOLO_ENABLED
         value: "false"

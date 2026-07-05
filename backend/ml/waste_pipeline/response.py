@@ -134,6 +134,12 @@ def build_classify_response(
     headline_src = str(core.get("headline_source") or "vit")
     caveat_parts = []
 
+    if core.get("cloud_lite"):
+        caveat_parts.append(
+            "Cloud lite mode (Render): colour/texture cues only — no PyTorch on the server. "
+            "Run locally with npm run dev:full for full ViT inference."
+        )
+
     scene_type = str(core.get("scene_type") or "")
     scene_conf = float(core.get("scene_confidence") or 0.0)
     secondary_key = str(core.get("secondary_material") or "").strip().lower()
@@ -221,7 +227,11 @@ def build_classify_response(
         "efficientnet_b0": "CNN — EfficientNet-B0",
     }.get(config.backbone, "Vision Transformer (ViT)")
 
-    model_display = f"{architecture} · {config.model_id}"
+    if core.get("cloud_lite"):
+        model_display = "Cloud lite (colour cues · Render)"
+        architecture = "Cloud lite classifier"
+    else:
+        model_display = f"{architecture} · {config.model_id}"
 
     probs_api = core.get("prob_rows") or [
         {"label": DISPLAY_LABEL[k], "pct": core["six_way_probs"].get(k, 0.0)} for k in WASTE_KEYS

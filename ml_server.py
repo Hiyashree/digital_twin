@@ -159,10 +159,12 @@ next_report_id = 1
 @app.route("/health", methods=["GET"])
 def health():
     """Render health checks and browser visits to the service root."""
+    cloud_lite = os.environ.get("WASTE_CLOUD_LITE", "").strip().lower() in ("1", "true", "yes")
     return jsonify(
         {
             "ok": True,
             "service": "digital-twin-api",
+            "inference_mode": "cloud_lite" if cloud_lite else "hf_ml",
             "endpoints": [
                 "/classify_waste",
                 "/reports",
@@ -180,6 +182,19 @@ def waste_model_config():
     """Expose pipeline mode, backbone, and target categories for dashboard / ops."""
     cfg = load_pipeline_config()
     from ml.waste_pipeline.categories import DISPLAY_LABEL, WASTE_KEYS
+
+    cloud_lite = os.environ.get("WASTE_CLOUD_LITE", "").strip().lower() in ("1", "true", "yes")
+    if cloud_lite:
+        return jsonify(
+            {
+                "pipeline_mode": "cloud_lite",
+                "backbone": "colour_cues",
+                "model_id": "cloud-lite-v1",
+                "categories": [{"key": k, "label": DISPLAY_LABEL[k]} for k in WASTE_KEYS],
+                "datasets_supported": ["TrashNet", "TACO", "custom (Meghalaya)"],
+                "docs": "Render cloud lite — PIL/NumPy colour cues. Use local ml_server.py for ViT.",
+            }
+        )
 
     return jsonify(
         {
@@ -612,8 +627,12 @@ def _warm_waste_classifier_async():
     threading.Thread(target=_run, daemon=True, name="waste-model-warmup").start()
 
 
-# Gunicorn on Render sets PORT; warm the model at import so the first browser request does not OOM/time out.
-if os.environ.get("PORT"):
+# Warm HF weights locally only — cloud lite mode needs no PyTorch preload.
+if os.environ.get("PORT") and os.environ.get("WASTE_CLOUD_LITE", "").strip().lower() not in (
+    "1",
+    "true",
+    "yes",
+):
     _warm_waste_classifier_async()
 
 

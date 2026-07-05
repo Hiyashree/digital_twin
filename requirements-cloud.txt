@@ -1,0 +1,7 @@
+# Render cloud API — no PyTorch (uses colour-cue lite classifier via WASTE_CLOUD_LITE=true).
+python-dotenv>=1.0.0
+flask>=3.0.0
+gunicorn>=22.0.0
+numpy>=1.24.0
+scikit-learn>=1.3.0
+pillow>=10.0.0
