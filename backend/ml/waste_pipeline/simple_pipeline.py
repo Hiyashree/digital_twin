@@ -11,8 +11,6 @@ import os
 from typing import Any, Optional, Tuple
 
 from ml.waste_pipeline.config import PipelineConfig
-from ml.waste_pipeline.hf_classifier import classify_pil_hf, get_hf_pipeline
-from ml.waste_pipeline.vit_inference import classify_pil_vit, get_vit_bundle, use_explicit_vit_runtime
 
 
 def _cloud_lite_enabled() -> bool:
@@ -33,6 +31,9 @@ def run_simple_waste_pipeline(
         from ml.waste_pipeline.lite_classifier import classify_pil_lite
 
         return classify_pil_lite(pil_rgb)
+
+    from ml.waste_pipeline.hf_classifier import classify_pil_hf, get_hf_pipeline
+    from ml.waste_pipeline.vit_inference import classify_pil_vit, get_vit_bundle, use_explicit_vit_runtime
 
     if use_explicit_vit_runtime(cfg):
         model, processor = get_vit_bundle(cfg)
